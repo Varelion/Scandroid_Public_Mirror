@@ -1,0 +1,10 @@
+.DS_Store
+.cache/
+.vscode/
+logs/
+node_modules/
+.env
+.git-log.txt
+.gitattributes
+.pebblegit
+
