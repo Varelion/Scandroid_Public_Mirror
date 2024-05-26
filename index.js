@@ -79,7 +79,6 @@ function parsing(message) {
 	// Remove spaces and convert to lowercase
 	// console.log(message)
 	const x = message.content.replace(/\s+/g, '').toLowerCase();
-	console.log(x);
 
 	// Check if x is not an empty string and is included in POSSIBILITIES
 	if (x !== '' && POSSIBILITIES.includes(x)) {
