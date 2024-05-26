@@ -163,10 +163,8 @@ module.exports = {
 		// Send confirmation message
 
 		if (newCharacterName.length < oldCharacterName.length) {
-			console.log("HERE");
 			newCharacterName = equalize(newCharacterName, oldCharacterName.length);
 		} else if (oldCharacterName.length < newCharacterName.length) {
-			console.log("HERE");
 			oldCharacterName = equalize(oldCharacterName, newCharacterName.length);
 		} else {
 			// Default case, do nothing
@@ -183,13 +181,17 @@ module.exports = {
 		const inactive_character_stringer = `\`「DORMANT」:  ${oldCharacterName}  「 INDEX 」:  ${oldCharacterIndex}\``;
 		const active_character_stringer = `\`「CURRENT」:  ${newCharacterName}  「 INDEX 」:  ${characterIndex + 1}\``;
 
-		console.log(inactive_character_stringer);
-		console.log(active_character_stringer);
+		console.log(`User: "${interaction.user.globalName}"\n`, inactive_character_stringer, "\n", active_character_stringer);
 
 
 
 
-		await interaction.editReply({ content: `${inactive_character_stringer}\n${active_character_stringer}`, ephemeral: false }); // Edit the deferred reply with the final message
+		try {
+			await interaction.editReply({ content: `${inactive_character_stringer}\n${active_character_stringer}`, ephemeral: false }); // Edit the deferred reply with the final message
+		} catch {
+			console.log("Used .set instead of /set")
+		}
+
 		// await interaction.followUp({ content: active_character_stringer, ephemeral: false }); // Send a follow-up message after deferring the reply
 
 		// Log the active character change

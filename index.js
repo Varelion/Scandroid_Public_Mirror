@@ -1,14 +1,17 @@
 const dotenv = require('dotenv');
 const fs = require('fs');
 
-const { Client, Collection, GatewayIntentBits, Partials, EmbedBuilder, InteractionType, ChannelType } = require('discord.js');
+const { Client, Collection, GatewayIntentBits, Partials, EmbedBuilder, InteractionType, ChannelType, CommandInteractionOptionResolver, GuildMember } = require('discord.js');
 const sqlite3 = require("sqlite3");
 
 const { guildService } = require("./src/services/guild");
 const { sqlLite3DatabaseService } = require("./src/database/sqlite");
 
 const { getActiveCharacterIndex, getXp, getRoleMultiplier, getLevelInfo, getTier, logCommand, logError } = require("./src/utils");
-const { Some_BioAndroid_COLOR, Some_BioAndroid_ICON_URL } = require("./src/config.json")
+const { Some_BioAndroid_COLOR, Some_BioAndroid_ICON_URL, CLIENT_ID } = require("./src/config.json")
+
+
+
 /*
 -----------------------
 LOADING ENV VARS (.env)
@@ -58,6 +61,82 @@ client.once('ready', () => {
 });
 
 
+const POSSIBILITIES = [
+	".set1",
+	".set2",
+	".set3",
+	".set4",
+	".set5",
+	".set6",
+	".set7",
+	".set8",
+	".set9",
+	".set10",
+];
+
+
+function parsing(message) {
+	// Remove spaces and convert to lowercase
+	// console.log(message)
+	const x = message.content.replace(/\s+/g, '').toLowerCase();
+	console.log(x);
+
+	// Check if x is not an empty string and is included in POSSIBILITIES
+	if (x !== '' && POSSIBILITIES.includes(x)) {
+		const index = POSSIBILITIES.indexOf(x);
+		console.log("Here at index:", index);
+
+		executeInteraction(index, message);
+	}
+}
+
+async function executeInteraction(index, message) {
+	try {
+		const gService = new guildService(
+			await new sqlLite3DatabaseService(sqlite3, `./guilds/${message.guildId}.db`)
+		)
+		await gService.init();
+		if (!await gService.isRegistered() && command.data.name != "register") {
+			// Try Catch on the reply, because this is a restful call, and errors can be found
+			try {
+				await interaction.editReply({
+					content: `Sorry, but your server is not registered, please contact <@${interaction.guild.ownerId}> and ask them todo \`/register\`.`,
+					ephemeral: true
+				});
+			} catch (error) { };
+			return;
+		}
+
+		let interaction = {
+			type: InteractionType.ApplicationCommand,
+			commandName: 'set',
+			client,
+			member: await message.guild.members.fetch(message.author.id),
+			user: message.author,
+			guildId: message.guildId,
+			applicationId: CLIENT_ID,
+			channelId: message.channelId,
+			guild: message.guild,
+			options: new CommandInteractionOptionResolver(client, [
+				{
+					name: 'character',
+					type: 4, // INTEGER option type
+					value: index + 1, // Convert index to 1-based indexing
+				},
+			]),
+		};
+
+
+		// Emit the interactionCreate event with the simulated interaction data
+		// client.emit('interactionCreate', interaction);
+		const command = client.commands.get(interaction.commandName);
+		await command.execute(gService, interaction);
+	} catch (error) {
+		console.log(error);
+	}
+}
+
+
 client.on('interactionCreate', async interaction => {
 	/*
 	-------------------------------------
@@ -69,7 +148,6 @@ client.on('interactionCreate', async interaction => {
 	const command = client.commands.get(interaction.commandName);
 	if (!command) return;
 	const guildId = `${interaction.guildId}`;
-
 
 	// LOADING GUILD SERVICE
 	const gService = new guildService(
@@ -117,6 +195,9 @@ XP PER POST
 */
 client.on('messageCreate', async message => {
 	try {
+
+		parsing(message);
+
 		let IS_COMBAT = false;
 
 		/*
