@@ -26,7 +26,7 @@ module.exports = {
 					"# __End-User:__\n" +
 					"1. Use `/xp` to check their own XP\n" +
 					"2. Use `/edit_character` to change your character's name or portrait\n" +
-					"3. Use `/set` to change which character is gaining XP. For example, Kei's first character is Lumina, with an index number of 1, and Amica, with an index number of 2. To gain XP on Amica, she would use `/set 2`. To switch to Lumina, she would do `/set 1`. This is a **vital** step if you wish to have multiple characters on one Discord account. Staff will monitor to ensure everyone is doing this properly so that XP is awarded to the correct characters.\n" +
+					"3. Use `/set` to change which character is gaining XP. For example, Kei's first character is Lumina, with an index number of 1, and Amica, with an index number of 2. To gain XP on Amica, she would use `/set 2`. To switch to Lumina, she would do `/set 1`. This is a **vital** step if you wish to have multiple characters on one Discord account. Staff will monitor to ensure everyone is doing this properly so that XP is awarded to the correct characters.\n**NOTE**: mobile users might find it better to try `.set1` instead, as this requires less inputs. You, of course, could use `.set#` where `#` is the index of the character you wish to change. Note: this will not confirm your character change." +
 					"4. Go to `/xp`, then click the 'Retire' button twice to retire a character. This will ping staff and inform them what XP your character ended at so that they can do the proper retirement calculations\n\n" +
 					"# __Staff:__\n" +
 					'1. Use /approve_player to select a player and approve a character. Staff must set the player’s name for them initially, but they can change it after the fact.\n' +
@@ -39,7 +39,7 @@ module.exports = {
 			await interaction.editReply({ embeds: [helpEmbed] });
 		} catch (error) {
 			console.error(error);
-			await interaction.editReply("An error occurred while trying to display the help information. Please try again later.");
+			await interaction.delete("An error occurred while trying to display the help information. Please try again later.");
 		}
 	},
 };

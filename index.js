@@ -94,23 +94,27 @@ async function executeInteraction(index, message) {
 	try {
 		const gService = new guildService(
 			await new sqlLite3DatabaseService(sqlite3, `./guilds/${message.guildId}.db`)
-		)
+		);
 		await gService.init();
+
 		if (!await gService.isRegistered() && command.data.name != "register") {
-			// Try Catch on the reply, because this is a restful call, and errors can be found
 			try {
-				await interaction.editReply({
-					content: `Sorry, but your server is not registered, please contact <@${interaction.guild.ownerId}> and ask them todo \`/register\`.`,
+				await message.reply({
+					content: `Sorry, but your server is not registered, please contact <@${message.guild.ownerId}> and ask them to do \`/register\`.`,
 					ephemeral: true
 				});
-			} catch (error) { };
+			} catch (error) {
+				console.error('Failed to send registration reply:', error);
+			}
 			return;
 		}
 
+		// Simulated interaction object
 		let interaction = {
-			type: InteractionType.ApplicationCommand,
+			type: 'APPLICATION_COMMAND',
 			commandName: 'set',
 			client,
+			message: message,
 			member: await message.guild.members.fetch(message.author.id),
 			user: message.author,
 			guildId: message.guildId,
@@ -124,17 +128,39 @@ async function executeInteraction(index, message) {
 					value: index + 1, // Convert index to 1-based indexing
 				},
 			]),
+			reply: async (content) => {
+				try {
+					const sentMessage = await message.reply(content);
+					return sentMessage;
+				} catch (error) {
+					console.error('Failed to send reply:', error);
+				}
+			},
+			// editReply: async (newContent) => {
+			// 	try {
+			// 		const messages = await message.channel.messages.fetch({ limit: 100 }); // Fetch a larger number of messages
+			// 		const botMessage = messages.find(msg => msg.author.id === client.user.id && msg.reference?.messageId === message.id);
+			// 		if (botMessage) {
+			// 			await botMessage.edit(newContent);
+			// 		} else {
+			// 			console.warn('Bot message not found for editing.');
+			// 			// If the bot's message is not found, try to send a new message
+			// 			await interaction.reply(newContent);
+			// 		}
+			// 	} catch (error) {
+			// 		console.error('Failed to edit reply:', error);
+			// 	}
+			// }
+
 		};
 
-
-		// Emit the interactionCreate event with the simulated interaction data
-		// client.emit('interactionCreate', interaction);
 		const command = client.commands.get(interaction.commandName);
 		await command.execute(gService, interaction);
 	} catch (error) {
-		console.log(error);
+		console.error('Error executing interaction:', error);
 	}
 }
+
 
 
 client.on('interactionCreate', async interaction => {

@@ -187,9 +187,14 @@ module.exports = {
 
 
 		try {
-			await interaction.editReply({ content: `${inactive_character_stringer}\n${active_character_stringer}`, ephemeral: false }); // Edit the deferred reply with the final message
+			await interaction.editReply({ content: `${inactive_character_stringer}\n${active_character_stringer}`, ephemeral: true }); // Edit the deferred reply with the final message
 		} catch {
 			console.log("Used .set instead of /set")
+			await interaction.message.delete();
+			let x = await interaction.message.channel.send(`<@${interaction.message.author.id}> ${active_character_stringer}`)
+			setTimeout(() => {
+				x.delete()
+			}, 3000)
 		}
 
 		// await interaction.followUp({ content: active_character_stringer, ephemeral: false }); // Send a follow-up message after deferring the reply
