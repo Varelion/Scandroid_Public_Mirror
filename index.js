@@ -300,11 +300,10 @@ client.on('messageCreate', async message => {
 		// --------------------------
 
 		// Code to execute if the author's global name includes the ice cube character
-		if (message.member.nickname.includes('\u{1F9CA}')) {
+		if (message.member.nickname != '' && message.member.nickname.includes('\u{1F9CA}')) {
 			// Code to execute if the author's global name includes the ice cube character
 			return
 		}
-		console.log("continued")
 		const xp = getXp(messageCount, roleBonus, gService.channels[channel.id], gService.config["xpPerPostDivisor"], gService.config["xpPerPostFormula"], IS_COMBAT);
 		//#end region EXP / XP Calculations
 
